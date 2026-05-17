@@ -83,23 +83,36 @@ async function setDoorStatus(status) {
         btnOpen.disabled = true;
         btnClose.disabled = true;
 
-        const response = await fetch(`${FIREBASE_DATABASE_URL}/run/state.json`, {
-            method: 'PUT', // Dùng PUT để ghi đè giá trị tại đích
+        const note = status === '1' ? 'Đã_Mở_Cửa' : 'Đã_Đóng_Cửa';
+
+        // Ghi cả state và strnote bằng PATCH (cập nhật từng phần)
+        const response = await fetch(`${FIREBASE_DATABASE_URL}/run.json`, {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
-            // Firebase REST yêu cầu body là chuỗi JSON
-            body: JSON.stringify(status)
+            body: JSON.stringify({
+                state: status,
+                strnote: note
+            })
         });
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Không cần gọi updateUI(status) ở đây vì 
-        // hàm listenForRealtimeUpdates() sẽ tự động bắt sự kiện và cập nhật.
-        // Tuy nhiên, có thể cập nhật luôn để phản hồi UI nhanh hơn:
         updateUI(status);
+        infoStrnote.textContent = `Trạng thái: ${note}`;
+
+        // Load lại biến /run/ip và /run/strnote
+        const getRes = await fetch(`${FIREBASE_DATABASE_URL}/run.json`);
+        if (getRes.ok) {
+            const data = await getRes.json();
+            if (data) {
+                if (data.ip) infoIp.textContent = `IP: ${data.ip}`;
+                if (data.strnote) infoStrnote.textContent = `Trạng thái: ${data.strnote}`;
+            }
+        }
 
     } catch (error) {
         console.error("Lỗi khi cập nhật trạng thái:", error);
@@ -134,8 +147,7 @@ function listenForRealtimeUpdates() {
         console.log("Đã kết nối luồng Realtime (SSE) tới Firebase thành công.");
     };
 
-    // Firebase REST SSE sử dụng event 'put' khi có thay đổi dữ liệu
-    eventSource.addEventListener('put', (e) => {
+    const handleData = (e) => {
         try {
             const data = JSON.parse(e.data);
             console.log("Dữ liệu realtime thay đổi:", data);
@@ -162,7 +174,11 @@ function listenForRealtimeUpdates() {
         } catch (err) {
             console.error("Lỗi khi parse dữ liệu realtime:", err);
         }
-    });
+    };
+
+    // Firebase REST SSE sử dụng event 'put' hoặc 'patch' khi có thay đổi dữ liệu
+    eventSource.addEventListener('put', handleData);
+    eventSource.addEventListener('patch', handleData);
 
     eventSource.onerror = (error) => {
         console.error("Lỗi kết nối Realtime (EventSource):", error);
