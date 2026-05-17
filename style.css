@@ -81,24 +81,52 @@ body {
     overflow: hidden;
 }
 
-/* Biểu tượng cửa nhà xe */
-.door-icon {
-    width: 40px;
+/* Biểu tượng cánh cổng (Swing Gate) */
+.gate-container {
+    width: 46px;
     height: 40px;
-    background-color: white;
-    border-radius: 4px;
-    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.5s ease;
+    display: flex;
+    justify-content: center;
+    perspective: 300px;
     position: relative;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.door-icon::after {
+.gate-left, .gate-right {
+    width: 23px;
+    height: 100%;
+    background-color: white;
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.gate-left {
+    transform-origin: left center;
+    border-radius: 4px 0 0 4px;
+}
+
+.gate-right {
+    transform-origin: right center;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Chi tiết song cửa */
+.gate-left::before, .gate-right::before {
+    content: '';
+    position: absolute;
+    top: 6px; bottom: 6px; left: 6px; right: 6px;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    border-radius: 2px;
+}
+
+/* Đường kẻ nền mờ dưới cổng */
+.gate-container::after {
     content: '';
     position: absolute;
     bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
-    width: 50px;
+    width: 60px;
     height: 4px;
     background-color: rgba(255,255,255,0.5);
     border-radius: 2px;
@@ -110,9 +138,12 @@ body {
     box-shadow: 0 0 30px rgba(52, 199, 89, 0.4);
 }
 
-.status-indicator.open .door-icon {
-    transform: translateY(-20px);
-    height: 20px; /* Cửa kéo lên */
+.status-indicator.open .gate-left {
+    transform: rotateY(-110deg);
+}
+
+.status-indicator.open .gate-right {
+    transform: rotateY(110deg);
 }
 
 /* Trạng thái Closed */
@@ -120,9 +151,9 @@ body {
     background-color: var(--text-secondary);
 }
 
-.status-indicator.closed .door-icon {
-    transform: translateY(0);
-    height: 40px; /* Cửa đóng kín */
+.status-indicator.closed .gate-left,
+.status-indicator.closed .gate-right {
+    transform: rotateY(0deg);
 }
 
 .status-text {
