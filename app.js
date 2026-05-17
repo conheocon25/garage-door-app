@@ -9,12 +9,14 @@
  *    Ví dụ: "https://my-smart-home-default-rtdb.firebaseio.com"
  * 
  * 2. Cấu trúc dữ liệu trên Firebase Realtime Database:
- *    Mặc định webapp này sẽ đọc và ghi dữ liệu tại node: /garageDoor/status
+ *    Mặc định webapp này sẽ đọc và ghi dữ liệu tại node: /run
  *    
  *    Cấu trúc trên Firebase Console sẽ trông như sau:
  *    your-project-id-default-rtdb
- *    └── garageDoor
- *        └── status: "closed"  (hoặc "open")
+ *    └── run
+ *        ├── state: "0"  (hoặc "1")
+ *        ├── ip: "192.168.1.1"
+ *        └── strnote: "Bình thường"
  * 
  * 3. Quy tắc bảo mật (Security Rules) trên Firebase Console:
  *    Để test nhanh, bạn có thể set Rules thành public:
@@ -31,17 +33,19 @@
  */
 
 // 1. CẤU HÌNH URL FIREBASE
-const FIREBASE_DATABASE_URL = "https://myautodoorgaracar-default-rtdb.firebaseio.com";
+const FIREBASE_DATABASE_URL = "https://mycardoor-fa2df.firebaseio.com";
 
 // Tự động tạo URL truy cập qua REST API
 // Chú ý: .json là bắt buộc khi dùng Firebase REST API
-const STATUS_ENDPOINT = `${FIREBASE_DATABASE_URL}/garageDoor/status.json`;
+const RUN_ENDPOINT = `${FIREBASE_DATABASE_URL}/run.json`;
 
 // DOM Elements
 const statusText = document.getElementById('status-text');
 const statusIndicator = document.getElementById('status-indicator');
 const btnOpen = document.getElementById('btn-open');
 const btnClose = document.getElementById('btn-close');
+const infoIp = document.getElementById('info-ip');
+const infoStrnote = document.getElementById('info-strnote');
 
 // Trạng thái hiện tại
 let currentStatus = null;
@@ -52,11 +56,11 @@ let currentStatus = null;
 function updateUI(status) {
     currentStatus = status;
 
-    if (status === 'open') {
+    if (status === '1') {
         statusText.textContent = 'Cửa đang mở';
         statusText.className = 'status-text open';
         statusIndicator.className = 'status-indicator open';
-    } else if (status === 'closed') {
+    } else if (status === '0') {
         statusText.textContent = 'Cửa đang đóng';
         statusText.className = 'status-text closed';
         statusIndicator.className = 'status-indicator closed';
@@ -79,7 +83,7 @@ async function setDoorStatus(status) {
         btnOpen.disabled = true;
         btnClose.disabled = true;
 
-        const response = await fetch(STATUS_ENDPOINT, {
+        const response = await fetch(`${FIREBASE_DATABASE_URL}/run/state.json`, {
             method: 'PUT', // Dùng PUT để ghi đè giá trị tại đích
             headers: {
                 'Content-Type': 'application/json',
@@ -108,8 +112,8 @@ async function setDoorStatus(status) {
 }
 
 // Gắn sự kiện cho các nút
-btnOpen.addEventListener('click', () => setDoorStatus('open'));
-btnClose.addEventListener('click', () => setDoorStatus('closed'));
+btnOpen.addEventListener('click', () => setDoorStatus('1'));
+btnClose.addEventListener('click', () => setDoorStatus('0'));
 
 /**
  * Lắng nghe thay đổi dữ liệu Realtime sử dụng Server-Sent Events (SSE)
@@ -120,11 +124,11 @@ function listenForRealtimeUpdates() {
     // Tránh lỗi nếu URL chưa thay đổi từ mẫu
     if (FIREBASE_DATABASE_URL.includes("your-project-id")) {
         console.warn("VUI LÒNG THAY ĐỔI FIREBASE_DATABASE_URL ĐỂ ỨNG DỤNG HOẠT ĐỘNG THỰC TẾ.");
-        updateUI('closed'); // Mock trạng thái ban đầu
+        updateUI('0'); // Mock trạng thái ban đầu
         return;
     }
 
-    const eventSource = new EventSource(STATUS_ENDPOINT);
+    const eventSource = new EventSource(RUN_ENDPOINT);
 
     eventSource.onopen = () => {
         console.log("Đã kết nối luồng Realtime (SSE) tới Firebase thành công.");
@@ -136,15 +140,24 @@ function listenForRealtimeUpdates() {
             const data = JSON.parse(e.data);
             console.log("Dữ liệu realtime thay đổi:", data);
 
-            // Firebase trả về { path: "/", data: "open" } 
-            // path là / vì ta đang nghe ngay tại node status
-            if (data && data.data !== undefined) {
+            if (data && data.data !== undefined && data.data !== null) {
                 if (data.path === '/') {
+                    if (data.data.state !== undefined) updateUI(data.data.state);
+                    if (data.data.ip !== undefined) infoIp.textContent = `IP: ${data.data.ip}`;
+                    if (data.data.strnote !== undefined) infoStrnote.textContent = `Trạng thái: ${data.data.strnote}`;
+                } else if (data.path === '/state') {
                     updateUI(data.data);
+                } else if (data.path === '/ip') {
+                    infoIp.textContent = `IP: ${data.data}`;
+                } else if (data.path === '/strnote') {
+                    infoStrnote.textContent = `Trạng thái: ${data.data}`;
                 }
             } else if (data.data === null) {
-                // Node chưa tồn tại hoặc bị xóa
-                updateUI('closed');
+                if (data.path === '/') {
+                    updateUI('0');
+                    infoIp.textContent = 'IP: --';
+                    infoStrnote.textContent = 'Trạng thái: --';
+                }
             }
         } catch (err) {
             console.error("Lỗi khi parse dữ liệu realtime:", err);

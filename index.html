@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,25 +9,40 @@
     <!-- Sử dụng font Inter cho giao diện hiện đại -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-container">
         <div class="card">
-            <h1 class="title">Ứng dụng Mở cửa nhà xe</h1>
-            
+            <h1 class="title">Mở cửa Gara Ôtô</h1>
+
             <div class="status-container">
                 <div class="status-indicator" id="status-indicator">
                     <div class="door-icon" id="door-icon"></div>
                 </div>
                 <p class="status-text" id="status-text">Đang kết nối...</p>
             </div>
-            
+
+            <div class="info-container" style="margin-bottom: 24px; text-align: left; width: 100%; background: #f4f4f5; padding: 16px; border-radius: 20px;">
+                <p id="info-ip" style="margin-bottom: 8px; font-size: 15px; color: #333; font-weight: 500;">IP: --</p>
+                <p id="info-strnote" style="font-size: 15px; color: #333; font-weight: 500;">Trạng thái: --</p>
+            </div>
+
             <div class="button-group">
-                <button id="btn-open" class="btn btn-blue">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <button id="btn-open" class="btn btn-green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
                     Mở cửa
                 </button>
-                <button id="btn-close" class="btn btn-red">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <button id="btn-close" class="btn btn-blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
                     Đóng cửa
                 </button>
             </div>
@@ -34,4 +50,5 @@
     </div>
     <script src="app.js"></script>
 </body>
+
 </html>

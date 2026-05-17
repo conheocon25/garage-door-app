@@ -175,13 +175,13 @@ body {
     background-color: var(--blue-active);
 }
 
-.btn-red {
-    background-color: var(--red-color);
-    box-shadow: 0 10px 20px rgba(255, 59, 48, 0.2);
+.btn-green {
+    background-color: var(--green-color);
+    box-shadow: 0 10px 20px rgba(52, 199, 89, 0.2);
 }
 
-.btn-red:active, .btn-red:hover {
-    background-color: var(--red-active);
+.btn-green:active, .btn-green:hover {
+    background-color: #28a745;
 }
 
 .btn:disabled {
