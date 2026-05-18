@@ -11,7 +11,27 @@
 </head>
 
 <body>
-    <div class="app-container">
+    <div id="login-overlay" class="login-overlay hidden">
+        <div class="card login-card">
+            <h1 class="title">Đăng nhập</h1>
+            <p style="margin-bottom: 20px; color: var(--text-secondary); font-size: 15px;">Xác thực để truy cập điều khiển cửa</p>
+            <input type="password" id="login-password" class="login-input" placeholder="Mật khẩu" />
+            <p id="login-error" class="hidden" style="color: var(--red-color); margin-bottom: 16px; font-size: 14px;">Mật khẩu không chính xác</p>
+            
+            <button id="btn-login" class="btn btn-blue" style="margin-bottom: 16px;">
+                Đăng nhập
+            </button>
+            <button id="btn-biometric" class="btn biometric-btn hidden">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" style="display:none;"/>
+                    <path d="M5 3a2 2 0 0 0-2 2"></path><path d="M19 3a2 2 0 0 1 2 2"></path><path d="M21 19a2 2 0 0 1-2 2"></path><path d="M5 21a2 2 0 0 1-2-2"></path><path d="M9 12v-1"></path><path d="M15 12v-1"></path><path d="M12 16v.01"></path>
+                </svg>
+                Face ID / Vân tay
+            </button>
+        </div>
+    </div>
+
+    <div class="app-container" id="app-container">
         <div class="card">
             <h1 class="title">Mở cửa Gara Ôtô</h1>
 
